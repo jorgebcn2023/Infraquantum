@@ -1,6 +1,6 @@
 (() => {
   const script = document.currentScript;
-  const base = (script?.dataset.apiBase || new URL(script.src).origin).replace(/\\/$/, "");
+  const base = (script?.dataset.apiBase || new URL(script.src).origin).replace(/\/$/, "");
   const assistantId = script?.dataset.assistantId || "default";
   const host = document.createElement("div");
   host.id = "web-ai-assistant-root";
