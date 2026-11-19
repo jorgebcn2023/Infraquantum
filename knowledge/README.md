@@ -1,0 +1,1 @@
+# Knowledge sources\n\nAñade aquí documentación pública y aprobada para el negocio. No subas datos personales, contraseñas ni documentos confidenciales a este repositorio público. Para producción se utilizará almacenamiento privado y una sincronización controlada.\n
