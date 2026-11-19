@@ -56,7 +56,7 @@ class ChatIn(BaseModel):
 
 
 def clean_text(value: str) -> str:
-    return re.sub(r"\\s+", " ", value).strip()
+    return re.sub(r"\s+", " ", value).strip()
 
 
 def split_chunks(value: str, size=1100, overlap=140):
@@ -87,7 +87,7 @@ def add_source(kind, locator, title, content):
 
 
 def retrieve(query):
-    terms = [t.lower() for t in re.findall(r"\\w+", query) if len(t) > 2][:12]
+    terms = [t.lower() for t in re.findall(r"\w+", query) if len(t) > 2][:12]
     if not terms:
         return []
     with connect() as con:
