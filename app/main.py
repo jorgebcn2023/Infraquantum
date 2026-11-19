@@ -50,7 +50,7 @@ class ChatIn(BaseModel):
     assistant_id: str = "default"
 
 def clean_text(value: str) -> str:
-    return re.sub(r"\\s+", " ", value).strip()
+    return re.sub(r"\s+", " ", value).strip()
 
 def split_chunks(value: str, size=1100, overlap=140):
     value = clean_text(value)
@@ -78,7 +78,7 @@ def add_source(kind, locator, title, content):
     return {"id": source_id, "chunks": len(chunks), "status": "indexed" if chunks else "empty"}
 
 def retrieve(query):
-    terms = [t.lower() for t in re.findall(r"\\w+", query) if len(t) > 2][:12]
+    terms = [t.lower() for t in re.findall(r"\w+", query) if len(t) > 2][:12]
     with connect() as con:
         faqs = con.execute("SELECT question,answer FROM faqs WHERE active=1").fetchall()
         chunks = con.execute("SELECT title,content FROM chunks").fetchall()
@@ -124,7 +124,7 @@ def chat(body: ChatIn, request: Request):
                 "Eres el asistente oficial de una empresa. Responde en el idioma del usuario. "
                 "Usa exclusivamente el CONTEXTO para afirmar datos de la empresa. "
                 "Si falta información, dilo claramente y no inventes. Sé conciso.\\n\\n"
-                + "CONTEXTO:\\n" + "\\n---\\n".join(context)
+                + "CONTEXTO:\\n" + "\n---\n".join(context)
             )
             result = client.chat.completions.create(
                 model=os.getenv("OPENAI_MODEL", "gpt-4.1-mini"),
@@ -136,7 +136,7 @@ def chat(body: ChatIn, request: Request):
             )
             answer = result.choices[0].message.content or "No he podido generar una respuesta."
         else:
-            answer = "He encontrado esta información en la base de conocimiento:\\n\\n" + "\\n\\n".join(context)
+            answer = "He encontrado esta información en la base de conocimiento:\\n\\n" + "\n\n".join(context)
     with connect() as con:
         con.executemany(
             "INSERT INTO conversations(session_id,role,content) VALUES(?,?,?)",
