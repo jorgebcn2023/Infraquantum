@@ -124,7 +124,7 @@ def chat(body: ChatIn, request: Request):
                 "Eres el asistente oficial de una empresa. Responde en el idioma del usuario. "
                 "Usa exclusivamente el CONTEXTO para afirmar datos de la empresa. "
                 "Si falta información, dilo claramente y no inventes. Sé conciso.\\n\\n"
-                + "CONTEXTO:\\n" + "\n---\n".join(context)
+                + "CONTEXTO:\n" + "\n---\n".join(context)
             )
             result = client.chat.completions.create(
                 model=os.getenv("OPENAI_MODEL", "gpt-4.1-mini"),
@@ -136,7 +136,7 @@ def chat(body: ChatIn, request: Request):
             )
             answer = result.choices[0].message.content or "No he podido generar una respuesta."
         else:
-            answer = "He encontrado esta información en la base de conocimiento:\\n\\n" + "\n\n".join(context)
+            answer = "He encontrado esta información en la base de conocimiento:\n\n" + "\n\n".join(context)
     with connect() as con:
         con.executemany(
             "INSERT INTO conversations(session_id,role,content) VALUES(?,?,?)",
