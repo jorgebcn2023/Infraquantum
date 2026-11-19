@@ -14,7 +14,7 @@ uvicorn app.main:app --reload
 ## Variables
 - `ADMIN_API_KEY`: clave aleatoria larga, obligatoria para operaciones administrativas.
 - `OPENAI_API_KEY`: opcional.
-- `ALLOWED_ORIGINS`: dominios separados por comas; si queda vacío, CORS permite orígenes para el widget público. No se usan cookies y las API admin requieren Bearer.
+- `ALLOWED_ORIGINS`: dominios separados por comas. Para el sitio principal, configura `https://infraquantum.org` (sin ruta ni barra final). Añade `https://www.infraquantum.org` solo si también sirves la web desde ese host. No se usan cookies y las API admin requieren Bearer.
 - `DATABASE_PATH`: ruta SQLite.
 
 ## Widget
