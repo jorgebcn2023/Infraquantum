@@ -13,9 +13,9 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 from openai import OpenAI
 
-from app.db import connect, init_db
-
 load_dotenv()
+
+from app.db import connect, init_db
 app = FastAPI(title="WEB AI ASSISTANT API", version="1.0.0")
 origins = [x.strip() for x in os.getenv("ALLOWED_ORIGINS", "").split(",") if x.strip()]
 app.add_middleware(
