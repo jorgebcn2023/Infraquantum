@@ -1,53 +1,17 @@
 (() => {
-  const script = document.currentScript;
-  const base = (script?.dataset.apiBase || new URL(script.src).origin).replace(/\/$/, "");
-  const assistantId = script?.dataset.assistantId || "default";
-  const host = document.createElement("div");
-  host.id = "web-ai-assistant-root";
-  document.body.appendChild(host);
-  const shadow = host.attachShadow({ mode: "open" });
-  shadow.innerHTML = `
-  <style>
-    *{box-sizing:border-box;font-family:system-ui,sans-serif}
-    .launcher{position:fixed;right:22px;bottom:22px;border:0;border-radius:999px;background:#173b72;color:white;padding:15px 19px;cursor:pointer;box-shadow:0 5px 22px #0003;font-weight:650;z-index:2147483000}
-    .panel{position:fixed;right:22px;bottom:82px;width:min(370px,calc(100vw - 28px));height:min(560px,calc(100vh - 115px));background:white;border:1px solid #ddd;border-radius:16px;box-shadow:0 10px 40px #0003;display:none;flex-direction:column;overflow:hidden;z-index:2147483000;color:#172033}
-    .panel.open{display:flex}.head{background:#173b72;color:white;padding:15px;font-weight:700}.sub{font-size:12px;opacity:.8;font-weight:400}
-    .messages{padding:13px;overflow:auto;flex:1;background:#f7f8fa}.bubble{padding:10px 12px;margin:8px 0;border-radius:12px;white-space:pre-wrap;line-height:1.4;font-size:14px;max-width:90%}.bot{background:white;border:1px solid #e5e7eb}.user{background:#dceafe;margin-left:auto}
-    form{display:flex;padding:10px;border-top:1px solid #eee;gap:7px}input{min-width:0;flex:1;border:1px solid #ccd2dc;border-radius:9px;padding:11px;font-size:14px}button.send{border:0;background:#173b72;color:white;border-radius:9px;padding:0 14px;cursor:pointer}
-  </style>
-  <button class="launcher" aria-label="Abrir asistente">¿Necesitas ayuda?</button>
-  <section class="panel" aria-label="Asistente virtual">
-    <div class="head">Asistente virtual<div class="sub">Respuestas basadas en la información oficial</div></div>
-    <div class="messages"><div class="bubble bot">Hola. ¿En qué puedo ayudarte?</div></div>
-    <form><input maxlength="4000" placeholder="Escribe tu consulta..." aria-label="Tu consulta" required><button class="send">Enviar</button></form>
-  </section>`;
-  const $ = selector => shadow.querySelector(selector);
-  const panel = $(".panel"), messages = $(".messages");
-  const session = (crypto.randomUUID && crypto.randomUUID()) || String(Date.now()) + Math.random();
-  $(".launcher").onclick = () => panel.classList.toggle("open");
-  $("form").addEventListener("submit", async event => {
-    event.preventDefault();
-    const input = $("input"), message = input.value.trim();
-    if (!message) return;
-    const add = (value, cls) => {
-      const el = document.createElement("div");
-      el.className = "bubble " + cls;
-      el.textContent = value;
-      messages.appendChild(el);
-      messages.scrollTop = messages.scrollHeight;
-    };
-    add(message, "user"); input.value = "";
-    const button = $(".send"); button.disabled = true;
-    try {
-      const response = await fetch(base + "/api/chat", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message, session_id: session, assistant_id: assistantId })
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.detail || "Error");
-      add(data.answer || "No hay respuesta disponible.", "bot");
-    } catch (_) {
-      add("No se pudo conectar con el asistente. Inténtalo más tarde.", "bot");
-    } finally { button.disabled = false; input.focus(); }
-  });
+ const script=document.currentScript;if(!script||!document.body)return;
+ const base=(script.dataset.apiBase||new URL(script.src,location.href).origin).replace(/\/$/,"");
+ const assistantId=script.dataset.assistantId||"default";
+ const host=document.createElement("div");host.id="web-ai-assistant-root";document.body.appendChild(host);
+ const shadow=host.attachShadow({mode:"open"});
+ shadow.innerHTML=`<style>*{box-sizing:border-box;font-family:system-ui,sans-serif}.launcher{position:fixed;right:22px;bottom:22px;border:0;border-radius:999px;background:#173b72;color:white;padding:15px 19px;cursor:pointer;box-shadow:0 5px 22px #0003;font-weight:650;z-index:2147483000}.panel{position:fixed;right:22px;bottom:82px;width:min(370px,calc(100vw - 28px));height:min(560px,calc(100vh - 115px));background:white;border:1px solid #ddd;border-radius:16px;box-shadow:0 10px 40px #0003;display:none;flex-direction:column;overflow:hidden;z-index:2147483000;color:#172033}.panel.open{display:flex}.head{background:#173b72;color:white;padding:15px;font-weight:700}.sub{font-size:12px;opacity:.8;font-weight:400}.messages{padding:13px;overflow:auto;flex:1;background:#f7f8fa}.bubble{padding:10px 12px;margin:8px 0;border-radius:12px;white-space:pre-wrap;line-height:1.4;font-size:14px;max-width:90%}.bot{background:white;border:1px solid #e5e7eb}.user{background:#dceafe;margin-left:auto}form{display:flex;padding:10px;border-top:1px solid #eee;gap:7px}input{min-width:0;flex:1;border:1px solid #ccd2dc;border-radius:9px;padding:11px;font-size:14px}button.send{border:0;background:#173b72;color:white;border-radius:9px;padding:0 14px;cursor:pointer}button:disabled{opacity:.55;cursor:wait}</style><button class="launcher" type="button" aria-label="Abrir asistente" aria-expanded="false">¿Necesitas ayuda?</button><section class="panel" aria-label="Asistente virtual" aria-live="polite"><div class="head">Asistente virtual<div class="sub">Respuestas basadas en la información oficial</div></div><div class="messages"><div class="bubble bot">Hola. ¿En qué puedo ayudarte?</div></div><form><input maxlength="4000" placeholder="Escribe tu consulta..." aria-label="Tu consulta" required><button class="send" type="submit">Enviar</button></form></section>`;
+ const $=s=>shadow.querySelector(s),panel=$(".panel"),messages=$(".messages"),launcher=$(".launcher");
+ const session=(globalThis.crypto&&crypto.randomUUID)?crypto.randomUUID():String(Date.now())+Math.random().toString(36).slice(2);
+ launcher.addEventListener("click",()=>{const open=panel.classList.toggle("open");launcher.setAttribute("aria-expanded",String(open));if(open)$("input").focus()});
+ $("form").addEventListener("submit",async event=>{event.preventDefault();const input=$("input"),message=input.value.trim();if(!message)return;
+ const add=(value,cls)=>{const el=document.createElement("div");el.className="bubble "+cls;el.textContent=value;messages.appendChild(el);messages.scrollTop=messages.scrollHeight};
+ add(message,"user");input.value="";const button=$(".send");button.disabled=true;
+ try{const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),25000);let response;try{response=await fetch(base+"/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message,session_id:session,assistant_id:assistantId}),signal:controller.signal})}finally{clearTimeout(timeout)}const data=await response.json();if(!response.ok)throw new Error(data.detail||"Error");add(data.answer||"No hay respuesta disponible.","bot")}
+ catch(_){add("No se pudo conectar con el asistente. Inténtalo más tarde.","bot")}finally{button.disabled=false;input.focus()}
+ });
 })();

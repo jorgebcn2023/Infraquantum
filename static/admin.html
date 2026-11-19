@@ -1,50 +1,10 @@
-<!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WEB AI ASSISTANT · Admin</title>
-<style>
-body{margin:0;background:#f3f5f8;color:#172033;font:15px system-ui}header{background:#173b72;color:white;padding:22px 5vw}main{max-width:1000px;margin:25px auto;padding:0 18px}.card{background:white;border:1px solid #e1e5ec;border-radius:14px;padding:18px;margin:14px 0}input,textarea,button{font:inherit;padding:10px;border:1px solid #ccd2dc;border-radius:8px}input,textarea{width:100%;margin:6px 0 12px;box-sizing:border-box}button{background:#173b72;color:white;border:0;cursor:pointer;margin:4px 4px 4px 0}.muted{color:#687386;font-size:13px}.item{border-top:1px solid #eee;padding:10px 0}#status{white-space:pre-wrap}
-</style></head><body>
-<header><h1>WEB AI ASSISTANT</h1><div>Panel de administración · V1.0</div></header>
-<main>
-<section class="card"><h2>Conexión segura</h2><label>Clave administrativa (Bearer)</label><input id="key" type="password" autocomplete="off" placeholder="ADMIN_API_KEY"><button onclick="loadAll()">Conectar</button><div id="status" class="muted">Introduce tu clave administrativa.</div></section>
-<section class="card"><h2>Crear FAQ</h2><input id="q" placeholder="Pregunta"><textarea id="a" rows="4" placeholder="Respuesta oficial"></textarea><button onclick="addFaq()">Guardar FAQ</button></section>
-<section class="card"><h2>Importar página web</h2><input id="url" type="url" placeholder="https://empresa.com/ayuda"><button onclick="ingestUrl()">Indexar URL</button></section>
-<section class="card"><h2>Importar documento</h2><p class="muted">Formatos iniciales: TXT, MD y HTML (máximo 5 MB).</p><input id="file" type="file" accept=".txt,.md,.html"><button onclick="ingestFile()">Subir e indexar</button></section>
-<section class="card"><h2>Base de conocimiento</h2><div id="stats" class="muted"></div><div id="faqs"></div><h3>Fuentes</h3><div id="sources"></div></section>
-<script>
-const $ = id => document.getElementById(id);
-const headers = () => ({ Authorization: "Bearer " + $("key").value });
-async function api(path, options={}) {
-  const response = await fetch(path, {...options, headers: {...headers(), ...(options.headers||{})}});
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.detail || "Error");
-  return data;
-}
-function status(value) { $("status").textContent = typeof value === "string" ? value : JSON.stringify(value,null,2); }
-function esc(value) { return String(value).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
-async function loadAll() {
-  try {
-    const [faqs,sources,stats] = await Promise.all([api("/admin/api/faqs"),api("/admin/api/sources"),api("/admin/api/analytics")]);
-    $("faqs").innerHTML = faqs.map(x=>`<div class="item"><b>${esc(x.question)}</b><p>${esc(x.answer)}</p><button onclick="delFaq(${x.id})">Eliminar</button></div>`).join("") || "Sin FAQ";
-    $("sources").innerHTML = sources.map(x=>`<div class="item">${esc(x.title||x.locator)} · ${esc(x.status)}</div>`).join("") || "Sin fuentes";
-    $("stats").textContent = `FAQ: ${stats.faqs} · Fuentes: ${stats.sources} · Fragmentos: ${stats.chunks} · Mensajes: ${stats.messages}`;
-    status("Conexión correcta.");
-  } catch(error) { status(error.message); }
-}
-async function addFaq() {
-  try { await api("/admin/api/faqs",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question:$("q").value,answer:$("a").value})}); $("q").value=""; $("a").value=""; await loadAll(); }
-  catch(error) { status(error.message); }
-}
-async function delFaq(id) { try { await api("/admin/api/faqs/"+id,{method:"DELETE"}); await loadAll(); } catch(error) { status(error.message); } }
-async function ingestUrl() {
-  try { const result=await api("/admin/api/ingest/url",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url:$("url").value})}); status(result); await loadAll(); }
-  catch(error) { status(error.message); }
-}
-async function ingestFile() {
-  try {
-    const form=new FormData(); form.append("file",$("file").files[0]);
-    const response=await fetch("/admin/api/ingest/file",{method:"POST",headers:headers(),body:form});
-    const result=await response.json(); if(!response.ok) throw new Error(result.detail||"Error");
-    status(result); await loadAll();
-  } catch(error) { status(error.message); }
-}
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WEB AI ASSISTANT · Admin</title><style>body{margin:0;background:#f3f5f8;color:#172033;font:15px system-ui}header{background:#173b72;color:white;padding:22px 5vw}main{max-width:1000px;margin:25px auto;padding:0 18px}.card{background:white;border:1px solid #e1e5ec;border-radius:14px;padding:18px;margin:14px 0}input,textarea,button{font:inherit;padding:10px;border:1px solid #ccd2dc;border-radius:8px}input,textarea{width:100%;margin:6px 0 12px;box-sizing:border-box}button{background:#173b72;color:white;border:0;cursor:pointer;margin:4px 4px 4px 0}.muted{color:#687386;font-size:13px}.item{border-top:1px solid #eee;padding:10px 0}#status{white-space:pre-wrap}.notice{background:#fff7e6;border:1px solid #f1d49b;padding:12px;border-radius:9px;color:#714d08}</style></head><body><header><h1>WEB AI ASSISTANT</h1><div>Panel de administración · V1.1</div></header><main><section class="card"><h2>Conexión segura</h2><label for="key">Clave administrativa (Bearer)</label><input id="key" type="password" autocomplete="off" placeholder="ADMIN_API_KEY"><button type="button" onclick="loadAll()">Conectar</button><div id="status" class="muted">Introduce tu clave administrativa. La clave solo permanece en esta página.</div></section><section class="card"><h2>Crear FAQ</h2><input id="q" maxlength="500" placeholder="Pregunta"><textarea id="a" rows="4" maxlength="10000" placeholder="Respuesta oficial"></textarea><button type="button" onclick="addFaq()">Guardar FAQ</button></section><section class="card"><h2>Importar documento</h2><p class="muted">Formatos admitidos: TXT, MD y HTML (máximo 5 MB).</p><input id="file" type="file" accept=".txt,.md,.html"><button type="button" onclick="ingestFile()">Subir e indexar</button></section><section class="card"><h2>Importación de páginas web</h2><p class="notice">Temporalmente deshabilitada en V1.1 hasta completar las protecciones contra SSRF.</p></section><section class="card"><h2>Base de conocimiento</h2><div id="stats" class="muted"></div><div id="faqs"></div><h3>Fuentes</h3><div id="sources"></div></section><script>
+const $=id=>document.getElementById(id),headers=()=>({Authorization:"Bearer "+$("key").value});
+async function api(path,options={}){const response=await fetch(path,{...options,headers:{...headers(),...(options.headers||{})}}),data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.detail||"Error HTTP "+response.status);return data}
+function status(value){$("status").textContent=typeof value==="string"?value:JSON.stringify(value,null,2)}
+function esc(value){return String(value).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+async function loadAll(){try{const [faqs,sources,stats]=await Promise.all([api("/admin/api/faqs"),api("/admin/api/sources"),api("/admin/api/analytics")]);$("faqs").innerHTML=faqs.map(x=>'<div class="item"><b>'+esc(x.question)+'</b><p>'+esc(x.answer)+'</p><button type="button" onclick="delFaq('+Number(x.id)+')">Eliminar</button></div>').join("")||"Sin FAQ";$("sources").innerHTML=sources.map(x=>'<div class="item">'+esc(x.title||x.locator)+' · '+esc(x.status)+'</div>').join("")||"Sin fuentes";$("stats").textContent='FAQ: '+stats.faqs+' · Fuentes: '+stats.sources+' · Fragmentos: '+stats.chunks+' · Mensajes: '+stats.messages;status("Conexión correcta.")}catch(error){status(error.message)}}
+async function addFaq(){try{await api("/admin/api/faqs",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question:$("q").value,answer:$("a").value})});$("q").value="";$("a").value="";await loadAll()}catch(error){status(error.message)}}
+async function delFaq(id){try{await api("/admin/api/faqs/"+id,{method:"DELETE"});await loadAll()}catch(error){status(error.message)}}
+async function ingestFile(){try{const selected=$("file").files[0];if(!selected)throw new Error("Selecciona un documento.");const form=new FormData();form.append("file",selected);const response=await fetch("/admin/api/ingest/file",{method:"POST",headers:headers(),body:form}),result=await response.json().catch(()=>({}));if(!response.ok)throw new Error(result.detail||"Error HTTP "+response.status);status(result);$("file").value="";await loadAll()}catch(error){status(error.message)}}
 </script></main></body></html>
