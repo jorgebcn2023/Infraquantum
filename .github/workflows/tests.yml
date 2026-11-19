@@ -1,7 +1,7 @@
 name: V1.1 tests
 on:
   push:
-    branches: ["hardening/v1.1"]
+    branches: ["main", "hardening/v1.1"]
   pull_request:
     branches: ["main"]
 jobs:
@@ -12,5 +12,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install -r requirements.txt pytest
-      - run: pytest -q
+      - run: pip install -r requirements.txt
+      - name: Run test suite
+        run: python -m pytest -q
+        env:
+          PYTHONPATH: ${{ github.workspace }}
