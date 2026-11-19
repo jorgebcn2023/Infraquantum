@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: infraquantum-web-ai-assistant
+    runtime: python
+    plan: starter
+    region: frankfurt
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DATABASE_PATH
+        value: /opt/render/project/src/data/assistant.db
+      - key: ADMIN_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-4.1-mini
+      - key: ALLOWED_ORIGINS
+        sync: false
